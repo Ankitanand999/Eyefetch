@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nexus | Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #00f2ff;
+            --glass: rgba(10, 20, 30, 0.8);
+            --border: rgba(0, 242, 255, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #02060a; /* Assuming your existing animated background sits here */
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            padding: 60px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        /* --- ADVANCED TEXT WORK --- */
+        .brand-header {
+            margin-bottom: 60px;
+            border-left: 3px solid var(--cyan);
+            padding-left: 25px;
+        }
+
+        .pre-title {
+            font-size: 0.7rem;
+            letter-spacing: 6px;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .main-title {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 700;
+            letter-spacing: -2px;
+            line-height: 0.9;
+            text-transform: uppercase;
+            /* Shimmer Effect */
+            background: linear-gradient(90deg, #fff 0%, var(--cyan) 50%, #fff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        /* --- INTERACTIVE TEXT BUTTONS --- */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #fff;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.02);
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-link:hover {
+            background: rgba(0, 242, 255, 0.05);
+            border-color: var(--cyan);
+            transform: translateY(-5px);
+        }
+
+        .link-id {
+            font-size: 0.6rem;
+            color: var(--cyan);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .link-text {
+            font-family: 'Syncopate', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .link-desc {
+            font-size: 0.75rem;
+            margin-top: 8px;
+            color: #888;
+            letter-spacing: 0px;
+        }
+
+        /* Hover interaction for text */
+        .nav-link:hover .link-text {
+            color: var(--cyan);
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+        }
+
+        /* Corner accents */
+        .container::before {
+            content: "INTEL_LINK_ESTABLISHED";
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 0.6rem;
+            color: var(--cyan);
+            opacity: 0.4;
+        }
+
+        @media (max-width: 768px) {
+            .main-title { font-size: 2.5rem; }
+            .menu-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="brand-header">
+            <p class="pre-title">System Interface // v3.0</p>
+            <h1 class="main-title">NEXUS</h1>
+        </header>
+
+        <div class="menu-grid">
+            <a href="/image" class="nav-link">
+                <span class="link-id">[ 01 ]</span>
+                <span class="link-text">Visual Harvest</span>
+                <span class="link-desc">Extract all image assets from target DOM</span>
+            </a>
+
+            <a href="/text_scraper" class="nav-link">
+                <span class="link-id">[ 02 ]</span>
+                <span class="link-text">Data Parser</span>
+                <span class="link-desc">Convert HTML structures to clean text</span>
+            </a>
+
+            <a href="/contact_extractor" class="nav-link">
+                <span class="link-id">[ 03 ]</span>
+                <span class="link-text">Intel Ops</span>
+                <span class="link-desc">Identify emails and contact metadata</span>
+            </a>
+
+            <a href="/all_scarper" class="nav-link">
+                <span class="link-id">[ 04 ]</span>
+                <span class="link-text">Deep Sync</span>
+                <span class="link-desc">Comprehensive recursive domain indexing</span>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

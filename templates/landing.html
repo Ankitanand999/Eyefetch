@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CVision | Intelligence Suite</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-1: #6366f1; 
+            --gradient-2: #a855f7; 
+            --gradient-3: #ec4899; 
+            --gradient-4: #06b6d4; 
+            --gradient-5: #10b981; 
+            --bg: #010409; 
+            --text-main: #f8fafc;
+            --text-dim: #cbd5e1;
+            --border: rgba(255, 255, 255, 0.12);
+            --card-bg: rgba(13, 17, 23, 0.7);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- Background Mesh --- */
+        .bg-mesh {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.15) 0px, transparent 40%),
+                radial-gradient(at 90% 10%, rgba(168, 85, 247, 0.15) 0px, transparent 40%),
+                radial-gradient(at 50% 50%, rgba(6, 182, 212, 0.05) 0px, transparent 50%);
+        }
+
+        /* --- Navbar --- */
+        nav {
+            position: fixed;
+            top: 20px; left: 50%;
+            transform: translateX(-50%);
+            width: 90%; max-width: 1100px;
+            padding: 12px 32px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(3, 7, 18, 0.6);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            transition: all 0.4s ease;
+        }
+
+        nav.scrolled {
+            top: 10px;
+            width: 95%;
+            background: rgba(3, 7, 18, 0.9);
+            border-color: var(--gradient-1);
+        }
+
+        .logo { 
+            font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 10px; 
+            background: linear-gradient(to right, var(--gradient-4), #fff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu { display: flex; gap: 25px; list-style: none; }
+        .nav-menu a { 
+            color: var(--text-dim); text-decoration: none; font-size: 0.85rem; 
+            font-weight: 600; transition: 0.3s;
+        }
+        .nav-menu a:hover { color: #fff; }
+
+        .nav-cta {
+            background: #fff; color: #000; padding: 10px 20px;
+            border-radius: 100px; font-weight: 700; font-size: 0.8rem;
+            text-decoration: none; transition: 0.3s;
+        }
+        .nav-cta:hover { transform: scale(1.05); background: var(--gradient-4); color: #fff; }
+
+        /* --- Hero --- */
+        .hero {
+            height: 60vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 0 10%;
+        }
+
+        .badge {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--gradient-1);
+            padding: 6px 16px; border-radius: 100px;
+            font-size: 0.7rem; font-weight: 700; margin-bottom: 20px;
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 800; line-height: 1.1; margin-bottom: 20px;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--gradient-4), var(--gradient-2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* --- Module Grid & Boxes --- */
+        .module-section { padding: 60px 10%; display: flex; justify-content: center; }
+        .module-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); 
+            gap: 30px; width: 100%; max-width: 1100px;
+        }
+
+        /* The Box as a Link */
+        .module-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .module-box {
+            background: var(--card-bg); 
+            border: 1px solid var(--border);
+            border-radius: 30px; padding: 45px; 
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative; overflow: hidden;
+            height: 100%;
+        }
+
+        /* Spotlight Effect */
+        .module-box::before {
+            content: ""; position: absolute; inset: 0;
+            background: radial-gradient(600px circle at var(--x) var(--y), rgba(255,255,255,0.06), transparent 40%);
+            opacity: 0; transition: opacity 0.3s;
+        }
+
+        .module-box:hover::before { opacity: 1; }
+
+        .module-box:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.03);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Icon Styles */
+        .icon-wrap {
+            width: 60px; height: 60px; border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 30px; border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+
+        .module-box:hover .icon-wrap {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .tint-indigo .icon-wrap { color: var(--gradient-1); background: rgba(99, 102, 241, 0.1); }
+        .tint-cyan .icon-wrap { color: var(--gradient-4); background: rgba(6, 182, 212, 0.1); }
+
+        .module-box h3 { font-size: 1.6rem; margin-bottom: 15px; font-weight: 700; color: #fff; }
+        .module-box p { color: var(--text-dim); font-size: 1rem; margin-bottom: 35px; }
+
+        /* Fake Button (Visual Only since parent is <a>) */
+        .btn-visual {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 14px 28px; color: #fff;
+            border-radius: 14px; font-weight: 700;
+            font-size: 0.85rem; transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-indigo { background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); }
+        .btn-cyan { background: linear-gradient(135deg, var(--gradient-4), var(--gradient-5)); }
+
+        .module-box:hover .btn-visual {
+            padding-right: 40px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* --- Technical Details --- */
+        .content-bottom { padding: 80px 10%; max-width: 1100px; margin: 0 auto; }
+        .desc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 50px 0; }
+        .desc-card {
+            background: rgba(255,255,255,0.02);
+            padding: 30px; border-radius: 20px; border: 1px solid var(--border);
+        }
+        .desc-card h4 { color: var(--gradient-4); margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; }
+
+        /* --- Footer Status --- */
+        .footer-status {
+            padding: 30px 10%;
+            display: flex; justify-content: space-between;
+            border-top: 1px solid var(--border);
+            font-size: 0.75rem; color: var(--text-dim);
+            max-width: 1100px; margin: 0 auto;
+        }
+
+        .status-tag { display: flex; align-items: center; gap: 8px; color: #4ade80; }
+        .pulse { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            70% { transform: scale(2.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        @media (max-width: 850px) {
+            .module-grid, .desc-grid { grid-template-columns: 1fr; }
+            .nav-menu { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-mesh"></div>
+
+    <nav id="navbar">
+        <div class="logo"><i data-lucide="aperture"></i> EyeFetch</div>
+        <ul class="nav-menu">
+            <li><a href="#solutions">Solutions</a></li>
+            <li><a href="#modules">Modules</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+        </ul>
+        <a href="/get-started" class="nav-cta">Get Started</a>
+    </nav>
+
+    <section class="hero">
+        <div class="badge">System v4.0 is Live</div>
+        <h1>Next-Gen <span>Visual Intelligence</span><br>For Modern Data.</h1>
+    </section>
+
+    <div class="module-section" id="modules">
+        <div class="module-grid">
+            
+            <a href="/nextpage" class="module-card-link">
+                <div class="module-box tint-indigo" onmousemove="handleHover(event)">
+                    <div class="icon-wrap"><i data-lucide="database" size="24"></i></div>
+                    <h3>Distributed Scraping</h3>
+                    <p>High-concurrency extraction engine with automatic proxy rotation and DOM reconstruction.</p>
+                    <div class="btn-visual btn-indigo">
+                        Initialize <i data-lucide="arrow-right" size="16"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="/yolo" class="module-card-link">
+                <div class="module-box tint-cyan" onmousemove="handleHover(event)">
+                    <div class="icon-wrap"><i data-lucide="scan-eye" size="24"></i></div>
+                    <h3>YOLO Neural Engine</h3>
+                    <p>Deploy custom-trained YOLOV10 models with real-time inference optimization for edge devices.</p>
+                    <div class="btn-visual btn-cyan">
+                        Launch <i data-lucide="zap" size="16"></i>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+    <div class="content-bottom" id="architecture">
+        <div class="badge">Architecture</div>
+        <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Deep Integration</h2>
+        <div class="desc-grid">
+            <div class="desc-card">
+                <h4>The Mission</h4>
+                <p>Bridging the gap between unstructured web data and actionable visual intelligence in real-time.</p>
+            </div>
+            <div class="desc-card">
+                <h4>The Stack</h4>
+                <p>Asynchronous Python core using FastAPI and PyTorch for neural network orchestration.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-status">
+        <div class="status-tag">
+            <div class="pulse"></div>
+            SYSTEM OPERATIONAL
+        </div>
+        <div>LATENCY: 12ms — GLOBAL-US-WEST</div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            window.scrollY > 50 ? nav.classList.add('scrolled') : nav.classList.remove('scrolled');
+        });
+
+        // Mouse Spotlight Effect
+        function handleHover(e) {
+            const box = e.currentTarget;
+            const rect = box.getBoundingClientRect();
+            box.style.setProperty('--x', `${e.clientX - rect.left}px`);
+            box.style.setProperty('--y', `${e.clientY - rect.top}px`);
+        }
+    </script>
+</body>
+</html>

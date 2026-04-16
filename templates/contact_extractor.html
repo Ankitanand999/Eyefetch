@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Teal Contact Extractor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Variables (DEEP TEAL & SILVER THEME) --- */
+        :root {
+            --bg-deep: #05141e;      /* Very Deep Teal/Black */
+            --glass-base: rgba(10, 35, 55, 0.4); /* Transparent Dark Teal */
+            --accent-main: #008080;  /* Deep Teal */
+            --accent-hover: #00a0a0; /* Brighter Teal */
+            --highlight-silver: #c0c0c0; /* Silver/Light Grey for emphasis */
+            --text-light: #f8fafc;
+            --text-secondary: #a0b0c0;
+            --data-color: #80c0d0;   /* Pale Aqua for list items */
+            --error-color: #e63946;  /* Red for errors (standard) */
+        }
+
+        /* --- Global Reset and Setup --- */
+        body, html {
+            margin: 0; padding: 0; 
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep); 
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* --- DYNAMIC BACKGROUND: Subtle Motion --- */
+        .motion-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.1;
+            
+            /* Radial glow for center focus (Deep Teal) */
+            background: radial-gradient(circle at center, rgba(0, 128, 128, 0.2) 0%, rgba(0, 0, 0, 0) 50%);
+            
+            /* Faint grid lines */
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            
+            animation: bg-drift 150s linear infinite;
+        }
+        @keyframes bg-drift {
+            from { background-position: 0 0; }
+            to { background-position: 6000px 6000px; }
+        }
+
+        /* --- Main Container: GLASSMORHISM EFFECT --- */
+        .container {
+            max-width: 900px; 
+            width: 90%;
+            padding: 40px;
+            
+            /* Glass properties */
+            background: var(--glass-base);
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
+            
+            border-radius: 16px;
+            border: 1px solid rgba(0, 128, 128, 0.3); /* Subtle Teal border */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), 0 0 15px var(--accent-main);
+            
+            transition: all 0.5s ease;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 1s ease-out forwards;
+            z-index: 10;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { 
+            text-align: center; 
+            color: var(--highlight-silver); /* Silver Title */
+            margin-bottom: 30px; 
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(192, 192, 192, 0.5); /* Subtle silver glow */
+        }
+
+        /* --- Input Group --- */
+        .input-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input[type=text] {
+            flex-grow: 1;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--text-light);
+            font-size: 1rem;
+            max-width: 600px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        /* Input Focus Glow (Silver) */
+        input[type=text]:focus {
+            outline: none;
+            border-color: var(--highlight-silver);
+            box-shadow: 0 0 15px rgba(192, 192, 192, 0.7);
+        }
+
+        button {
+            padding: 14px 30px; 
+            border: none;
+            background: var(--accent-main); /* Deep Teal Button */
+            color: white;
+            border-radius: 8px; 
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer; 
+            transition: all 0.3s ease;
+        }
+        
+        /* Button Hover */
+        button:hover { 
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 160, 160, 0.5);
+        }
+
+        /* --- Loader Animation --- */
+        .loader {
+            display: none;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--highlight-silver); /* Silver Spinner */
+            border-radius: 50%;
+            width: 30px; height: 30px;
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite; 
+            margin: 30px auto;
+            box-shadow: 0 0 10px rgba(192, 192, 192, 0.6);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- Result Area: Sub-Glass Layer --- */
+        .result { 
+            margin-top: 20px; 
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.5); 
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            border: 1px solid rgba(192, 192, 192, 0.4); /* Silver outline */
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
+            min-height: 150px;
+        }
+        
+        h2 { 
+            color: var(--highlight-silver); 
+            font-size: 1.4rem; 
+            margin-top: 15px;
+            border-bottom: 2px solid rgba(192, 192, 192, 0.3);
+            padding-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        /* List Styling for Data */
+        ul { 
+            list-style: none; 
+            padding-left: 0; 
+            margin-top: 10px;
+        }
+        ul li { 
+            margin-bottom: 8px; 
+            color: var(--data-color); /* Pale Aqua Data Color */
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            position: relative;
+            padding-left: 20px;
+        }
+        ul li::before {
+            content: '➤';
+            color: var(--accent-hover);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* General Result Text (Source/Contact Page) */
+        .result p {
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 128, 128, 0.15); /* Subtle Teal background */
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--accent-main);
+            font-size: 0.95rem;
+            word-wrap: break-word;
+        }
+        
+        /* Error Message Styling */
+        .result p.error {
+            color: var(--error-color);
+            background: rgba(230, 57, 70, 0.15);
+            border-left: 3px solid var(--error-color);
+            text-shadow: none;
+        }
+
+        /* Download Button Styling */
+        .download-group {
+            text-align: right; 
+            margin-top: 15px;
+        }
+        .download-group a {
+            text-decoration: none; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            background: var(--accent-main); 
+            color: white; 
+            font-weight: 600; 
+            transition: background 0.3s;
+            display: none; /* Hidden by default */
+        }
+        .download-group a:hover {
+            background: var(--accent-hover) !important;
+        }
+    </style>
+</head>
+<body>
+    
+<div class="motion-bg"></div>
+
+<div class="container">
+    <h1><span style="color:var(--highlight-silver);">EXECUTIVE</span> CONTACT INSIGHTS</h1>
+    <div class="input-group">
+        <input type="text" id="urlInput" placeholder="Enter target URL for analysis">
+        <button onclick="getContactInfo()">INITIATE SCAN</button>
+    </div>
+
+    <div class="loader" id="loader"></div>
+    <div id="result" class="result">
+        <p style="text-align:center; color:var(--text-secondary); margin-bottom:0; border-left: none; background: none;">
+            System operational. Ready to initiate web data extraction.
+        </p>
+    </div>
+    
+    <div class="download-group">
+        <a id="downloadCSV" href="/download/contacts_csv" download="extracted_contacts.csv" 
+           onmouseover="this.style.background='var(--accent-hover)'" onmouseout="this.style.background='var(--accent-main)'"
+        >Download Contacts (CSV)</a>
+    </div>
+
+</div>
+
+<script>
+async function getContactInfo() {
+    const url = document.getElementById('urlInput').value.trim();
+    const loader = document.getElementById('loader');
+    const resultDiv = document.getElementById('result');
+    const downloadLink = document.getElementById('downloadCSV'); 
+
+    if (!url) {
+        resultDiv.innerHTML = `<p class='error' style='text-align:center;'>🚫 ERROR: A valid URL is required for analysis.</p>`;
+        return;
+    }
+
+    resultDiv.innerHTML = '';
+    loader.style.display = 'block';
+    downloadLink.style.display = 'none'; // Hide button on new scan
+
+    try {
+        // --- ACTUAL FLASK API CALL ---
+        const response = await fetch('/get_contact_info', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: url })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            // Throw an object that the catch block can interpret
+            throw { json: () => Promise.resolve(errorData) }; 
+        }
+        
+        const data = await response.json();
+        // --- END: ACTUAL FLASK API CALL ---
+
+        loader.style.display = 'none';
+
+        if (data.error) {
+            resultDiv.innerHTML = `<p class='error' style='text-align:center;'>🔴 SCAN FAILED: ${data.error}</p>`;
+            return;
+        }
+
+        // Build the result HTML
+        resultDiv.innerHTML = `
+            <h2>TARGET INFO</h2>
+            <p>${data.source_url}</p>
+            
+            <h2>CONTACT PATHWAY</h2>
+            <p>${data.contact_page || 'N/A'}</p>
+            
+            <h2>EXTRACTED EMAILS (${data.emails.length})</h2>
+            ${data.emails.length > 0 ? `<ul>${data.emails.map(e => `<li>${e}</li>`).join('')}</ul>` : `<p class='error'>No general email addresses found.</p>`}
+            
+            <h2>GMAIL IDENTIFIERS (${data.gmail_only.length})</h2>
+            ${data.gmail_only.length > 0 ? `<ul>${data.gmail_only.map(g => `<li>${g}</li>`).join('')}</ul>` : `<p class='error'>No gmail addresses found.</p>`}
+            
+            <h2>PHONE LINES (${data.phones.length})</h2>
+            ${data.phones.length > 0 ? `<ul>${data.phones.map(p => `<li>${p}</li>`).join('')}</ul>` : `<p class='error'>No phone numbers found.</p>`}
+        `;
+        
+        // Show download button on success
+        downloadLink.style.display = 'inline-block'; 
+
+    } catch (err) {
+        loader.style.display = 'none';
+        downloadLink.style.display = 'none';
+        
+        let errorMessage = "SCAN FAILED: An unexpected network or API error occurred.";
+        
+        // Handle error response from server
+        if (err && typeof err.json === 'function') {
+            const apiError = await err.json();
+            errorMessage = apiError.error || errorMessage;
+        }
+        
+        resultDiv.innerHTML = `<p class='error' style='text-align:center;'>🔴 ${errorMessage}</p>`;
+        console.error(err);
+    }
+}
+</script>
+</body>
+</html>

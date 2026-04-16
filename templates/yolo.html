@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISION_OS // YOLOv8 Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --panel-color: #16161a;
+            --accent-color: #00ff99;
+            --stop-color: #ffcc00;
+            --reset-color: #ff4444;
+            --text-main: #ffffff;
+            --text-dim: #888;
+            --border-style: 1px solid #333;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* --- Main Layout Grid --- */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            grid-template-rows: 60px 1fr 180px;
+            height: 100vh;
+            gap: 12px;
+            padding: 12px;
+            box-sizing: border-box;
+        }
+
+        /* --- Header --- */
+        header {
+            grid-column: 1 / span 2;
+            background: var(--panel-color);
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            border-radius: 8px;
+            border: var(--border-style);
+        }
+
+        header h2 { 
+            color: var(--accent-color); 
+            margin: 0; 
+            font-size: 1.1rem; 
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            grid-row: 2 / span 2;
+            background: var(--panel-color);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: var(--border-style);
+        }
+
+        .stat-card {
+            background: #1c1c21;
+            padding: 18px;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .stat-card span { 
+            display: block; 
+            font-size: 0.75rem; 
+            color: var(--text-dim); 
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .stat-card b { font-size: 1.5rem; font-family: monospace; }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #start-btn { background: var(--accent-color); color: #000; }
+        #stop-btn { background: var(--stop-color); color: #000; }
+        #reset-btn { background: var(--reset-color); color: #fff; }
+
+        button:hover { opacity: 0.8; transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+
+        /* --- Main Viewport --- */
+        .main-view {
+            background: #000;
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 2px solid #222;
+        }
+
+        #video-stream {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .placeholder-text { 
+            color: #333; 
+            font-size: 1.2rem; 
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        /* --- Logs Panel --- */
+        .logs-panel {
+            background: var(--panel-color);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            overflow-y: auto;
+            color: #00cc77;
+            border: var(--border-style);
+        }
+
+        .log-entry { 
+            margin-bottom: 6px; 
+            border-bottom: 1px solid #222; 
+            padding-bottom: 4px;
+        }
+
+        .log-time { color: var(--text-dim); margin-right: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <header>
+            <h2>VISION_OS //YOLO_NET_INTERFACE</h2>
+        </header>
+
+        <div class="sidebar">
+            <div class="stat-card">
+                <span>SYSTEM STATUS</span>
+                <b id="sys-status">OFFLINE</b>
+            </div>
+            <div class="stat-card">
+                <span>OBJECTS IN FRAME</span>
+                <b id="obj-count">0</b>
+            </div>
+            
+            <div class="btn-group">
+                <button id="start-btn" onclick="startCamera()">Start Stream</button>
+                <button id="stop-btn" onclick="stopCamera()">Stop System</button>
+                <button id="reset-btn" onclick="location.reload()">Reset UI</button>
+            </div>
+        </div>
+
+        <div class="main-view">
+            <div id="placeholder" class="placeholder-text">
+                [ CAMERA FEED DISCONNECTED ]<br>
+                AWAITING UPLINK...
+            </div>
+            <img id="video-stream" src="" alt="YOLO Real-time Feed">
+        </div>
+
+        <div class="logs-panel" id="logs">
+            <div class="log-entry">> Initializing kernel...</div>
+            <div class="log-entry">> YOLOv8 engine ready.</div>
+        </div>
+    </div>
+
+    <script>
+        let isStreaming = false;
+        let statusInterval = null;
+
+        /**
+         * Initiates the video feed from the Flask backend
+         */
+        function startCamera() {
+            if (isStreaming) return;
+
+            const img = document.getElementById('video-stream');
+            const placeholder = document.getElementById('placeholder');
+            
+            // Link to the Flask MJPEG route
+            img.src = "/video_feed";
+            img.style.display = 'block';
+            placeholder.style.display = 'none';
+            
+            addLog("System Uplink: Established.");
+            addLog("Neural Network: Tracking enabled.");
+            
+            isStreaming = true;
+            
+            // Start polling the /status endpoint every 1 second
+            statusInterval = setInterval(updateDashboard, 1000);
+        }
+
+        /**
+         * Sends a POST request to destroy the background YOLO process
+         * and cleans up the UI.
+         */
+        async function stopCamera() {
+            if (!isStreaming) {
+                addLog("System is already offline.");
+                return;
+            }
+
+            try {
+                // Signal the backend to release the hardware
+                const response = await fetch('/stop_feed', { method: 'POST' });
+                const data = await response.json();
+
+                // Stop the Frontend UI from requesting frames
+                const img = document.getElementById('video-stream');
+                const placeholder = document.getElementById('placeholder');
+                const statusEl = document.getElementById('sys-status');
+                const countEl = document.getElementById('obj-count');
+
+                img.src = ""; // Breaks the MJPEG stream connection
+                img.style.display = 'none';
+                placeholder.style.display = 'block';
+                
+                statusEl.innerText = data.status; // "OFFLINE"
+                statusEl.style.color = "#ff4444";
+                countEl.innerText = "0";
+
+                // Stop polling
+                clearInterval(statusInterval);
+                isStreaming = false;
+                addLog("System Shutdown: Background process terminated.");
+
+            } catch (error) {
+                console.error("Error during shutdown:", error);
+                addLog("CRITICAL ERROR: Failed to kill process.");
+            }
+        }
+
+        /**
+         * Fetches real-time detection data from the server
+         */
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                // Update UI numbers
+                document.getElementById('obj-count').innerText = data.count;
+                
+                const statusEl = document.getElementById('sys-status');
+                statusEl.innerText = data.status;
+                statusEl.style.color = data.status === "ACTIVE" ? "#00ff99" : "#ff4444";
+
+                // Log detections only if items are found
+                if(data.count > 0) {
+                    addLog(`Detection update: ${data.count} target(s) identified.`);
+                }
+            } catch (error) {
+                console.warn("Polling error (Server might be busy)");
+            }
+        }
+
+        /**
+         * Helper to append styled logs to the console panel
+         */
+        function addLog(message) {
+            const logs = document.getElementById('logs');
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            
+            const time = new Date().toLocaleTimeString([], { hour12: false });
+            div.innerHTML = `<span class="log-time">[${time}]</span> > ${message}`;
+            
+            logs.prepend(div);
+            
+            // Optimization: Prevent memory leak by limiting log history
+            if (logs.children.length > 15) {
+                logs.removeChild(logs.lastChild);
+            }
+        }
+    </script>
+</body>
+</html>

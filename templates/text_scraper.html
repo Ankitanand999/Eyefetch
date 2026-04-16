@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Text Scraper | Top-Right Input</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Reset & Variables */
+        :root {
+            --bg-dark: #0A0A0A;
+            --card-dark: #1F1F1F;
+            --accent-color: #007bff; /* Clean blue */
+            --accent-hover: #0056b3;
+            --text-light: #E0E0E0;
+            --secondary-accent: #28A745; /* Green for success/code visualization */
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- DYNAMIC BACKGROUND (Particle/Grid Effect) --- */
+        .dynamic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -10;
+            overflow: hidden;
+            background: radial-gradient(circle at center, rgba(0, 123, 255, 0.05) 0%, rgba(0, 0, 0, 0) 50%);
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: shift-bg 300s linear infinite;
+        }
+        
+        @keyframes shift-bg {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+
+        /* --- MAIN CENTERED CONTAINER --- */
+        .content {
+            max-width: 1100px;
+            margin: 60px auto; 
+            padding: 40px;
+            background: var(--card-dark);
+            border-radius: 12px;
+            border-top: 3px solid var(--accent-color);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.7);
+            
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            
+            position: relative;
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: content-load 1s ease-out 0.5s forwards;
+        }
+        @keyframes content-load {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- HEADER ROW: Title + Input Group --- */
+        .header-row {
+            display: flex;
+            justify-content: space-between; /* Pushes content to the sides */
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            color: var(--text-light);
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin: 0; /* Remove default margin */
+            text-align: left;
+        }
+        h1 span {
+            color: var(--accent-color);
+        }
+
+        /* --- INPUT & CONTROL SECTION (Now part of the header) --- */
+        .control-section {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            max-width: 500px; /* Limit size of control group */
+        }
+
+        input[type=text] {
+            flex-grow: 1;
+            padding: 12px 15px; /* Slightly adjusted padding */
+            border-radius: 6px;
+            border: 1px solid #333;
+            background: #2b2b2b;
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 300;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        /* Input Focus Glow */
+        input[type=text]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.6);
+            animation: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            background: var(--accent-color);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        /* Button Hover Lift */
+        button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        }
+
+        /* --- PROGRESS BAR --- */
+        #progressWrapper {
+            display: none;
+            width: 100%;
+            height: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        #progressBar {
+            height: 100%;
+            width: 0%;
+            border-radius: 8px;
+            text-align: right;
+            line-height: 15px;
+            font-size: 0.7rem;
+            padding-right: 5px;
+            color: white;
+            background: linear-gradient(90deg, var(--accent-color), var(--secondary-accent));
+            transition: width 0.1s linear;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Text output (Console) */
+        #textOutput {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            min-height: 250px;
+            max-height: 60vh; 
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            line-height: 1.5;
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: border 0.3s;
+        }
+        #textOutput:hover {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        #textOutput p {
+            margin: 0;
+            padding: 2px 0;
+            border-left: 2px solid transparent; 
+        }
+        #textOutput p.status {
+            color: var(--secondary-accent);
+            border-left-color: var(--secondary-accent);
+            padding-left: 8px;
+        }
+
+        /* Download button */
+        .download-buttons { margin-top:10px; display: none; gap: 15px; justify-content: flex-end; }
+        .download-buttons a {
+            text-decoration:none;
+            color:white;
+            background: var(--secondary-accent);
+            padding:12px 25px;
+            border-radius:6px;
+            transition:all 0.3s ease;
+            font-weight: 600;
+        }
+        .download-buttons a:hover { 
+            background: #1e873b; 
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+<div class="dynamic-bg"></div>
+
+<div class="content">
+    
+    <div class="header-row">
+        <h1>Web <span>Data Scraper</span> Tool</h1>
+        
+        <div class="control-section">
+            <input type="text" id="urlInput" placeholder="Enter URL here">
+            <button onclick="fetchText()">Scrape Data</button>
+        </div>
+    </div>
+
+    <div id="progressWrapper">
+        <div id="progressBar"></div>
+    </div>
+
+    <div id="textOutput">
+        <p style="color:rgba(255,255,255,0.6); font-family: 'Inter', sans-serif;">
+            Ready to process. Please input a URL in the field above and click 'Scrape Data' to begin the extraction process.
+        </p>
+    </div>
+
+    <div class="download-buttons" id="downloadButtons">
+        <a id="downloadTXT" href="#" download="scraped_data.txt">Download TXT</a>
+    </div>
+
+</div>
+
+<script>
+async function fetchText() {
+    const url = document.getElementById('urlInput').value.trim();
+    if (!url) return alert("Please enter a valid URL!");
+
+    const output = document.getElementById('textOutput');
+    const progressWrapper = document.getElementById('progressWrapper');
+    const progressBar = document.getElementById('progressBar');
+    const downloadBtn = document.getElementById('downloadButtons');
+    const scrapeButton = document.querySelector('.control-section button');
+
+    // Reset UI
+    output.innerHTML = '';
+    progressWrapper.style.display = 'block';
+    progressBar.style.width = '0%';
+    progressBar.innerText = '0%';
+    downloadBtn.style.display = 'none';
+    scrapeButton.disabled = true;
+
+    try {
+        // --- API Call to Flask Backend ---
+        const response = await fetch('/get_text', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url: url })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+            progressBar.style.width = '100%';
+            progressBar.innerText = 'FAILED';
+            throw new Error(data.text || `HTTP Error: ${response.status}`);
+        }
+        
+        // --- Logic to handle successful data ---
+
+        const cleanText = data.text.trim();
+        
+        // Prepare download link using the URL provided by Flask
+        document.getElementById('downloadTXT').href = data.download_url;
+
+        // Simulate Line-by-Line Display 
+        const lines = cleanText.split('\n');
+        const total = lines.length;
+        const lineDisplayDelay = 40; // milliseconds per line
+
+        for (let i = 0; i < total; i++) {
+            const p = document.createElement('p');
+            p.textContent = lines[i];
+            
+            // Add a status class for visual cue on log/status lines
+            if (lines[i].startsWith('[INFO]') || lines[i].startsWith('[STATUS]') || lines[i].startsWith('[SUCCESS]') || lines[i].startsWith('[REPORT]') || lines[i].startsWith('[ERROR]')) {
+                p.classList.add('status');
+            }
+
+            output.appendChild(p);
+            output.scrollTop = output.scrollHeight; 
+
+            const percent = Math.round(((i + 1) / total) * 100);
+            progressBar.style.width = percent + '%';
+            
+            if (percent > 10) {
+                progressBar.innerText = percent + '%';
+            }
+
+            await new Promise(res => setTimeout(res, lineDisplayDelay)); 
+        }
+
+        // Finalize UI
+        progressBar.style.width = '100%';
+        progressBar.innerText = '100%';
+        progressWrapper.style.display = 'none';
+        downloadBtn.style.display = 'flex'; 
+        scrapeButton.disabled = false;
+
+    } catch (err) {
+        progressWrapper.style.display = 'none';
+        scrapeButton.disabled = false;
+        
+        let errorMessage = "An unexpected error occurred during processing.";
+        if (err.message) {
+             errorMessage = err.message;
+        }
+
+        output.innerHTML = `<p style='color:#dc3545;'>[ERROR] ${errorMessage}</p>`;
+        console.error(err);
+    }
+}
+</script>
+
+</body>
+</html>
